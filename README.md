@@ -246,7 +246,7 @@ bash
 # Generate project report
 python src/generate_report.py
 📁 Project Structure
-text
+```
 vulnerable-lab/
 ├── 📄 README.md                 # This file
 ├── 📄 requirements.txt          # Python dependencies
@@ -286,5 +286,6 @@ vulnerable-lab/
 └── 📁 tests/                   # Tests
     ├── 📄 test_vulnerabilities.py
     └── 📄 test_api.py
+```
 -- Test Payload
 admin' OR '1'='1
