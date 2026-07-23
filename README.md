@@ -122,19 +122,22 @@ No CSRF Protection - Vulnerability
 No Security Headers - Vulnerability
 
 ### 📦 Installation
-```
 # Check Python version
+```
 python --version  # Should be 3.8+
-
+```
 # Check pip
+```
 pip --version
-Step-by-Step Setup
+```
+#### Step-by-Step Setup
 1. Clone the Repository
-bash
+```
 git clone https://github.com/yourusername/vulnerable-lab.git
 cd vulnerable-lab
-2. Create Virtual Environment
-bash
+```
+3. Create Virtual Environment
+```
 # Windows
 python -m venv venv
 venv\Scripts\activate
@@ -142,19 +145,23 @@ venv\Scripts\activate
 # Linux/Mac
 python3 -m venv venv
 source venv/bin/activate
+```
 3. Install Dependencies
-bash
+```
 pip install -r requirements.txt
-4. Set Up Database
-bash
+```
+5. Set Up Database
 # The database will be created automatically when you run the app
 # Or manually:
+```
 python -c "from src.app import app, db; app.app_context().push(); db.create_all()"
+```
 5. Run the Application
-bash
-python src/app.py
-6. Access the Application
-text
+```
+python app.py
+```
+7. Access the Application
+```
 http://localhost:5000
 ```
 ### 🔑 Default Credentials
@@ -264,15 +271,6 @@ vulnerable-lab/
 │
 ├── 📁 instance/                # Database
 │   └── 📄 .gitkeep
-│
-├── 📁 docs/                    # Documentation
-│   ├── 📄 Project_Report.pdf
-│   ├── 📄 Presentation.pptx
-│   └── 📁 Screenshots/
-│       ├── 📄 figure1.png
-│       ├── 📄 figure2.png
-│       └── ...
-│
 └── 📁 tests/                   # Tests
     ├── 📄 test_vulnerabilities.py
     └── 📄 test_api.py
