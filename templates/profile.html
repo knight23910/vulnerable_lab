@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block title %}Profile - Vulnerable Lab{% endblock %}
+
+{% block content %}
+<div class="row fade-in-up">
+    <div class="col-lg-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-1 mb-3">👤</div>
+                <h3 class="text-white">{{ user.username }}</h3>
+                <p class="text-secondary">{{ user.email }}</p>
+                {% if user.is_admin %}
+                    <span class="badge bg-success">👑 Administrator</span>
+                {% else %}
+                    <span class="badge bg-secondary">Regular User</span>
+                {% endif %}
+                <hr style="border-color: rgba(255,255,255,0.1);">
+                <div class="text-start">
+                    <p><strong class="text-secondary">User ID:</strong> <code>{{ user.id }}</code></p>
+                    <p><strong class="text-secondary">Posts:</strong> {{ posts|length }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-pen"></i> Posts by {{ user.username }}</h4>
+            </div>
+            <div class="card-body">
+                {% if posts %}
+                    {% for post in posts %}
+                        <div class="card mb-3 bg-dark bg-opacity-25">
+                            <div class="card-body">
+                                <h5 class="text-white">{{ post.title }}</h5>
+                                <p class="text-secondary">{{ post.content }}</p>
+                                <small class="text-secondary">Post ID: <code>{{ post.id }}</code></small>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="alert alert-info">No posts found for this user.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- IDOR Demo -->
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle"></i> IDOR Vulnerability Demo
+            </div>
+            <div class="card-body">
+                <p><strong>Try this attack:</strong></p>
+                <ol class="text-secondary">
+                    <li>Change the username in the URL to view other profiles</li>
+                    <li>Try: <a href="{{ url_for('profile', username='admin') }}" class="text-primary">/profile/admin</a></li>
+                    <li>Notice you can view ANY user's profile!</li>
+                </ol>
+                <div class="alert alert-danger">
+                    <strong>Vulnerability:</strong> No authorization check - any authenticated user can view any profile!
+                </div>
+                <pre><code># Vulnerable Code:
+user = User.query.filter_by(username=username).first()
+# No check if current_user owns this profile!</code></pre>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,447 @@
+{% extends "base.html" %}
+
+{% block title %}Search - XSS Vulnerability Lab{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Search-specific styles */
+    .search-highlight {
+        background: rgba(255, 193, 7, 0.15);
+        border-left: 4px solid #FFC107;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+    
+    .xss-result {
+        background: rgba(255, 107, 107, 0.05);
+        border: 1px solid rgba(255, 107, 107, 0.1);
+        border-radius: 12px;
+        padding: 1rem;
+        margin-bottom: 0.8rem;
+        transition: all 0.3s ease;
+    }
+    
+    .xss-result:hover {
+        background: rgba(255, 107, 107, 0.08);
+        transform: translateX(5px);
+    }
+    
+    .xss-payload-box {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid rgba(255, 107, 107, 0.2);
+        margin-top: 1rem;
+    }
+    
+    .xss-payload-box .payload-item {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    
+    .xss-payload-box .payload-item:last-child {
+        border-bottom: none;
+    }
+    
+    .xss-payload-box code {
+        background: rgba(255, 107, 107, 0.15);
+        color: #FF6B6B;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.85rem;
+    }
+    
+    .result-counter {
+        color: rgba(255,255,255,0.4);
+        font-size: 0.85rem;
+    }
+    
+    /* XSS Alert animation */
+    .xss-alert-popup {
+        animation: xss-flash 0.5s ease 3;
+    }
+    
+    @keyframes xss-flash {
+        0%, 100% { background: rgba(255, 107, 107, 0.1); }
+        50% { background: rgba(255, 107, 107, 0.3); }
+    }
+    
+    .search-timer {
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.3);
+    }
+    
+    /* Live preview for XSS */
+    .live-preview {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 10px;
+        padding: 1rem;
+        border: 1px solid rgba(255,255,255,0.05);
+        margin-top: 1rem;
+        min-height: 60px;
+    }
+    
+    .live-preview .preview-label {
+        font-size: 0.7rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: rgba(255,255,255,0.3);
+        margin-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row fade-in-up">
+    <div class="col-lg-8 mx-auto">
+        <!-- XSS Warning -->
+        <div class="alert alert-danger border-0">
+            <div class="d-flex align-items-start">
+                <div class="me-3" style="font-size: 2rem;">⚠️</div>
+                <div>
+                    <h5 class="mb-1"><strong>Cross-Site Scripting (XSS) Vulnerability</strong></h5>
+                    <p class="mb-0">This search feature is vulnerable to XSS. Try searching for <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></p>
+                    <div class="mt-2">
+                        <span class="badge bg-danger">Critical</span>
+                        <span class="badge bg-warning text-dark">Reflected XSS</span>
+                        <span class="badge bg-info">No Sanitization</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Form -->
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0">
+                        <i class="fas fa-search text-primary"></i> Search Posts
+                    </h4>
+                    {% if query %}
+                        <span class="result-counter">
+                            <i class="fas fa-clock"></i> {{ search_time }}
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <form method="GET" action="{{ url_for('search') }}" id="searchForm">
+                    <div class="input-group input-group-lg">
+                        <input type="text" 
+                               class="form-control" 
+                               name="q" 
+                               id="searchInput"
+                               placeholder="Search for posts... (Try XSS payload!)" 
+                               value="{{ query }}"
+                               autocomplete="off">
+                        <button class="btn btn-primary" type="submit">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                        {% if query %}
+                            <a href="{{ url_for('search') }}" class="btn btn-outline-light">
+                                <i class="fas fa-times"></i> Clear
+                            </a>
+                        {% endif %}
+                    </div>
+                </form>
+
+                <!-- Live Preview of Input -->
+                <div class="live-preview" id="livePreview">
+                    <div class="preview-label">
+                        <i class="fas fa-eye"></i> Live Preview (Your input rendered as HTML)
+                    </div>
+                    <div id="previewContent" style="color: rgba(255,255,255,0.5); font-size: 0.9rem;">
+                        <span class="text-muted">Type something to see the preview...</span>
+                    </div>
+                    <div class="mt-2">
+                        <small class="text-danger">
+                            <i class="fas fa-exclamation-triangle"></i> 
+                            <strong>Warning:</strong> This preview shows your input without sanitization!
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- XSS Payload Examples -->
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-skull-crossbones"></i> XSS Payload Examples
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Click any payload to test it instantly:</p>
+                <div class="xss-payload-box">
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-danger me-2">Basic</span>
+                            <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="testXSS(this, '&lt;script&gt;alert(\'XSS\')&lt;/script&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-warning me-2">Alert</span>
+                            <code>&lt;script&gt;alert('Hacked!')&lt;/script&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-warning" onclick="testXSS(this, '&lt;script&gt;alert(\'Hacked!\')&lt;/script&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-info me-2">Prompt</span>
+                            <code>&lt;script&gt;prompt('Enter your name:')&lt;/script&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-info" onclick="testXSS(this, '&lt;script&gt;prompt(\'Enter your name:\')&lt;/script&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-success me-2">Cookie</span>
+                            <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-success" onclick="testXSS(this, '&lt;script&gt;alert(document.cookie)&lt;/script&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-secondary me-2">Image</span>
+                            <code>&lt;img src=x onerror=alert('XSS')&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" onclick="testXSS(this, '&lt;img src=x onerror=alert(\'XSS\')&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                    <div class="payload-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-danger me-2">Redirect</span>
+                            <code>&lt;script&gt;window.location='https://attacker.com'&lt;/script&gt;</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-danger" onclick="testXSS(this, '&lt;script&gt;window.location=\'https://attacker.com\'&lt;/script&gt;')">
+                            <i class="fas fa-play"></i> Test
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results -->
+        {% if query %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-list-ul"></i> Search Results
+                            <span class="badge bg-primary ms-2">{{ results|length }} found</span>
+                        </h5>
+                        <span class="search-timer">
+                            <i class="fas fa-clock"></i> {{ search_time }}
+                        </span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- ⚠️ VULNERABLE: Raw output without sanitization -->
+                    <div class="search-highlight">
+                        <strong>Search results for:</strong> 
+                        <span id="searchQueryDisplay">{{ query|safe }}</span>
+                        <!-- 🚨 XSS: |safe filter allows HTML/JS injection -->
+                    </div>
+                    
+                    {% if results %}
+                        {% for result in results %}
+                            <div class="xss-result">
+                                <h6 class="text-white mb-1">{{ result[1] }}</h6>
+                                <p class="text-secondary mb-0" style="font-size: 0.9rem;">{{ result[2][:150] }}{% if result[2]|length > 150 %}...{% endif %}</p>
+                                <small class="text-secondary">Post ID: <code>{{ result[0] }}</code></small>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> No posts found matching your search.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% else %}
+            <!-- Empty State -->
+            <div class="card mt-4">
+                <div class="card-body text-center py-5">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🔍</div>
+                    <h5 class="text-white">Search for posts</h5>
+                    <p class="text-secondary">Enter a search term above to find posts. <br>
+                    <span class="text-danger"><strong>Hint:</strong> Try an XSS payload like <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></span></p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- XSS Vulnerability Explanation -->
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Why This is Vulnerable to XSS
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-white"><i class="fas fa-code text-danger"></i> Vulnerable Code</h6>
+                        <pre class="bg-dark p-3 rounded" style="font-size: 0.8rem;"><code># app.py - Search Route
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    # ⚠️ NO SANITIZATION!
+    return render_template('search.html', 
+                         query=query,  # Raw user input
+                         results=results)
+
+# search.html - Template
+&lt;div&gt;
+    Search results for: {{ query|safe }}
+    &lt;!-- 🚨 |safe allows HTML/JS injection --&gt;
+&lt;/div&gt;</code></pre>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-white"><i class="fas fa-shield-alt text-success"></i> Secure Fix</h6>
+                        <pre class="bg-dark p-3 rounded" style="font-size: 0.8rem;"><code># app.py - Fixed Search Route
+from markupsafe import escape
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    # ✅ Sanitize input
+    safe_query = escape(query)
+    return render_template('search.html', 
+                         query=safe_query,  # Escaped
+                         results=results)
+
+# search.html - Fixed Template
+&lt;div&gt;
+    Search results for: {{ query }}
+    &lt;!-- ✅ Auto-escaped by Jinja2 --&gt;
+&lt;/div&gt;</code></pre>
+                        <div class="alert alert-success mt-2">
+                            <i class="fas fa-check-circle"></i> 
+                            <strong>Prevention:</strong> Always sanitize user input and use auto-escaping in templates!
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <h6 class="text-white"><i class="fas fa-list"></i> XSS Impact</h6>
+                    <ul class="text-secondary">
+                        <li><strong>Cookie Theft:</strong> Steal user session cookies</li>
+                        <li><strong>Session Hijacking:</strong> Take over user accounts</li>
+                        <li><strong>Defacement:</strong> Modify website content</li>
+                        <li><strong>Phishing:</strong> Redirect to malicious sites</li>
+                        <li><strong>Keylogging:</strong> Capture user keystrokes</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- XSS Challenge -->
+        <div class="card mt-4 border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">
+                    <i class="fas fa-trophy"></i> XSS Challenge
+                </h5>
+            </div>
+            <div class="card-body">
+                <p class="text-secondary">Can you make the page show a custom alert message?</p>
+                <div class="row g-2">
+                    <div class="col-md-6">
+                        <input type="text" class="form-control" id="challengeInput" 
+                               placeholder="Enter your XSS payload..." value="&lt;script&gt;alert('You win!')&lt;/script&gt;">
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-warning w-100" onclick="runChallenge()">
+                            <i class="fas fa-rocket"></i> Test
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-light w-100" onclick="resetChallenge()">
+                            <i class="fas fa-undo"></i> Reset
+                        </button>
+                    </div>
+                </div>
+                <div id="challengeResult" class="mt-3 p-3 rounded" style="background: rgba(0,0,0,0.3); min-height: 50px;">
+                    <span class="text-secondary">Your payload will be displayed here...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Search input live preview
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const previewContent = document.getElementById('previewContent');
+        
+        if (searchInput && previewContent) {
+            searchInput.addEventListener('input', function() {
+                const val = this.value || 'Type something to see the preview...';
+                previewContent.innerHTML = val;
+                
+                // Check for XSS indicators
+                if (val.includes('<script>') || val.includes('alert(') || val.includes('onerror=')) {
+                    previewContent.style.color = '#FF6B6B';
+                    previewContent.style.fontWeight = 'bold';
+                } else {
+                    previewContent.style.color = 'rgba(255,255,255,0.5)';
+                    previewContent.style.fontWeight = 'normal';
+                }
+            });
+        }
+    });
+    
+    // Test XSS payload
+    function testXSS(btn, payload) {
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.value = payload;
+            // Trigger the search
+            document.getElementById('searchForm').submit();
+        }
+    }
+    
+    // XSS Challenge
+    function runChallenge() {
+        const input = document.getElementById('challengeInput');
+        const result = document.getElementById('challengeResult');
+        const payload = input.value;
+        
+        if (payload) {
+            // ⚠️ VULNERABLE: Rendering user input directly!
+            result.innerHTML = payload;
+            result.style.border = '2px solid #FF6B6B';
+            result.style.background = 'rgba(255, 107, 107, 0.1)';
+            
+            // Check if it's an XSS payload
+            if (payload.includes('<script>') || payload.includes('alert(') || payload.includes('onerror=')) {
+                result.innerHTML += '<div class="mt-2 text-success"><i class="fas fa-check-circle"></i> XSS payload detected! The page is vulnerable.</div>';
+            }
+        } else {
+            result.innerHTML = '<span class="text-secondary">Please enter a payload.</span>';
+        }
+    }
+    
+    function resetChallenge() {
+        const result = document.getElementById('challengeResult');
+        result.innerHTML = '<span class="text-secondary">Your payload will be displayed here...</span>';
+        result.style.border = 'none';
+        result.style.background = 'rgba(0,0,0,0.3)';
+        document.getElementById('challengeInput').value = '';
+    }
+    
+    // Auto-submit when payload is selected
+    console.log('🔐 XSS Lab loaded! Try the challenge!');
+</script>
+{% endblock %}

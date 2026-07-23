@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Vulnerable Lab - Cybersecurity Education{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center fade-in-up">
+    <div class="position-relative" style="z-index: 1;">
+        <h1 class="hero-title">
+            🔐 Vulnerable Lab
+        </h1>
+        <p class="hero-subtitle">
+            A deliberately insecure web application for learning cybersecurity
+            and penetration testing skills in a safe, controlled environment.
+        </p>
+        <div class="d-flex justify-content-center gap-3 flex-wrap">
+            <a href="{{ url_for('login') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-sign-in-alt"></i> Get Started
+            </a>
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg">
+                <i class="fas fa-user-plus"></i> Register
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Vulnerabilities Overview -->
+<div class="row mt-5 g-4">
+    <div class="col-12">
+        <h2 class="text-center mb-4" style="color: #fff;">
+            <i class="fas fa-bug text-danger"></i> Vulnerabilities Included
+        </h2>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">🔓</div>
+            <div class="vuln-title">SQL Injection</div>
+            <span class="badge bg-danger vuln-severity">Critical</span>
+            <p class="vuln-desc mt-2">Login bypass vulnerability allowing unauthorized access.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">💀</div>
+            <div class="vuln-title">XSS</div>
+            <span class="badge bg-warning vuln-severity">High</span>
+            <p class="vuln-desc mt-2">Cross-Site Scripting vulnerability in search feature.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">⚡</div>
+            <div class="vuln-title">Command Injection</div>
+            <span class="badge bg-danger vuln-severity">Critical</span>
+            <p class="vuln-desc mt-2">OS command injection via the ping tool.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">🔍</div>
+            <div class="vuln-title">IDOR</div>
+            <span class="badge bg-warning vuln-severity">Medium</span>
+            <p class="vuln-desc mt-2">Insecure Direct Object Reference in profiles and posts.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">📁</div>
+            <div class="vuln-title">File Upload</div>
+            <span class="badge bg-danger vuln-severity">Critical</span>
+            <p class="vuln-desc mt-2">Unrestricted file upload without validation.</p>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="vuln-card">
+            <div class="vuln-icon">🔑</div>
+            <div class="vuln-title">Weak Authentication</div>
+            <span class="badge bg-warning vuln-severity">Medium</span>
+            <p class="vuln-desc mt-2">No password complexity or email validation.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Start Guide -->
+<div class="row mt-5">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-rocket text-primary"></i> Quick Start Guide
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="display-4 text-primary">1</div>
+                            <h5 class="text-white">Login or Register</h5>
+                            <p class="text-secondary">Use the login page or create a new account.</p>
+                            <small class="text-danger">💡 SQL Injection: <code>admin' OR '1'='1</code></small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="display-4 text-warning">2</div>
+                            <h5 class="text-white">Explore Vulnerabilities</h5>
+                            <p class="text-secondary">Test each vulnerability and see how they work.</p>
+                            <small class="text-warning">💡 Try XSS: <code>&lt;script&gt;alert('XSS')&lt;/script&gt;</code></small>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div class="display-4 text-success">3</div>
+                            <h5 class="text-white">Learn & Practice</h5>
+                            <p class="text-secondary">Understand the risks and how to prevent them.</p>
+                            <small class="text-success">💡 Command Injection: <code>whoami</code></small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Credentials -->
+<div class="row mt-4">
+    <div class="col-md-6 mx-auto">
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-key text-warning"></i> Demo Credentials
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col-6">
+                        <span class="badge bg-primary">Admin</span>
+                        <p class="mt-2"><code>admin / admin123</code></p>
+                    </div>
+                    <div class="col-6">
+                        <span class="badge bg-info">User</span>
+                        <p class="mt-2"><code>rahul / rahul123</code></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

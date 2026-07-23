@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Ping Tool - Vulnerable Lab{% endblock %}
+
+{% block content %}
+<div class="row fade-in-up">
+    <div class="col-lg-8 mx-auto">
+        <!-- Warning -->
+        <div class="alert alert-danger">
+            <h5><i class="fas fa-skull-crossbones"></i> Command Injection Vulnerability</h5>
+            <p class="mb-0">This tool directly executes your input in the system shell. <strong>ANY command</strong> you type will be executed!</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0"><i class="fas fa-terminal text-success"></i> Command Executor</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label for="ip" class="form-label">Enter Command</label>
+                        <input type="text" class="form-control" id="ip" name="ip" 
+                               placeholder="e.g., whoami" value="{{ command_executed or 'whoami' }}">
+                        <div class="form-text text-danger">
+                            ⚠️ ANY command will be executed on the server!
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fas fa-play"></i> Execute
+                    </button>
+                    <button type="button" class="btn btn-outline-light" onclick="document.getElementById('ip').value=''">
+                        <i class="fas fa-undo"></i> Clear
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Commands -->
+        <div class="card mt-4">
+            <div class="card-header bg-info text-white">
+                <i class="fas fa-lightbulb"></i> Quick Commands (Click to insert)
+            </div>
+            <div class="card-body">
+                <div class="d-flex gap-2 flex-wrap">
+                    <button class="btn btn-outline-light btn-sm" onclick="insertCommand('whoami')">
+                        <code>whoami</code>
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="insertCommand('ipconfig')">
+                        <code>ipconfig</code>
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="insertCommand('dir')">
+                        <code>dir</code>
+                    </button>
+                    <button class="btn btn-outline-light btn-sm" onclick="insertCommand('systeminfo')">
+                        <code>systeminfo</code>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="insertCommand('echo Hacked! & whoami')">
+                        <code>echo Hacked! &amp; whoami</code>
+                    </button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="insertCommand('whoami & ipconfig')">
+                        <code>whoami &amp; ipconfig</code>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        {% if result %}
+            <div class="card mt-4 border-success">
+                <div class="card-header bg-dark text-white">
+                    <h5 class="mb-0">
+                        <i class="fas fa-code"></i> Output
+                        {% if is_injection %}
+                            <span class="badge bg-danger ms-2">🚨 Injection Detected!</span>
+                        {% endif %}
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="command-output">
+                        {% if is_injection %}
+                            <div class="injection-warning">
+                                <i class="fas fa-skull-crossbones"></i> COMMAND INJECTION SUCCESSFUL!
+                            </div>
+                        {% endif %}
+                        <div class="output-header">$ {{ command_executed }}</div>
+                        <div class="output-text">{{ result }}</div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Vulnerability Explanation -->
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <i class="fas fa-exclamation-triangle"></i> Why This is Vulnerable
+            </div>
+            <div class="card-body">
+                <pre><code># Vulnerable Code:
+full_cmd = command  # User input is directly executed
+output = subprocess.check_output(full_cmd, shell=True)</code></pre>
+                <p class="text-secondary">The application takes user input and executes it directly in the system shell without any sanitization or validation.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function insertCommand(cmd) {
+    document.getElementById('ip').value = cmd;
+}
+</script>
+{% endblock %}

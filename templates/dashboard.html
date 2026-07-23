@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Vulnerable Lab{% endblock %}
+
+{% block content %}
+<!-- Stats -->
+<div class="row g-4 mb-4 fade-in-up">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_posts }}</div>
+            <div class="stat-label"><i class="fas fa-pen"></i> Total Posts</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ total_users }}</div>
+            <div class="stat-label"><i class="fas fa-users"></i> Total Users</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">{{ user_posts }}</div>
+            <div class="stat-label"><i class="fas fa-user-pen"></i> Your Posts</div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="stat-number">6</div>
+            <div class="stat-label"><i class="fas fa-bug"></i> Vulnerabilities</div>
+        </div>
+    </div>
+</div>
+
+<!-- Welcome -->
+<div class="card mb-4 fade-in-up">
+    <div class="card-body">
+        <div class="d-flex align-items-center">
+            <div class="display-1 me-3">👋</div>
+            <div>
+                <h2 class="text-white mb-0">Welcome back, {{ username }}!</h2>
+                <p class="text-secondary mb-0">Ready to test your security skills?</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Posts -->
+<h3 class="text-white mb-3">
+    <i class="fas fa-newspaper text-primary"></i> Recent Posts
+</h3>
+
+<div class="row">
+    {% for post in posts %}
+        <div class="col-md-6">
+            <div class="card mb-3 fade-in-up" style="animation-delay: {{ loop.index * 0.1 }}s;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ post.title }}</h5>
+                    <p class="card-text">{{ post.content[:150] }}{% if post.content|length > 150 %}...{% endif %}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-secondary">
+                            <i class="fas fa-user"></i> Author ID: {{ post.user_id }}
+                        </small>
+                        <a href="{{ url_for('view_post', post_id=post.id) }}" class="btn btn-primary btn-sm">
+                            Read More <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Quick Actions -->
+<div class="card mt-4">
+    <div class="card-header">
+        <i class="fas fa-bolt text-warning"></i> Quick Actions
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ url_for('search') }}" class="btn btn-outline-light">
+                <i class="fas fa-search"></i> Search (XSS)
+            </a>
+            <a href="{{ url_for('ping') }}" class="btn btn-outline-light">
+                <i class="fas fa-terminal"></i> Ping (Command Injection)
+            </a>
+            <a href="{{ url_for('upload_file') }}" class="btn btn-outline-light">
+                <i class="fas fa-upload"></i> Upload (File Upload)
+            </a>
+            <a href="{{ url_for('profile', username='admin') }}" class="btn btn-outline-light">
+                <i class="fas fa-user-secret"></i> View Admin (IDOR)
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

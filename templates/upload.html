@@ -1,0 +1,410 @@
+{% extends "base.html" %}
+
+{% block title %}File Upload - Vulnerable Lab{% endblock %}
+
+{% block extra_css %}
+<style>
+    .upload-area {
+        border: 2px dashed rgba(255,255,255,0.15);
+        border-radius: 16px;
+        padding: 3rem 2rem;
+        text-align: center;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        min-height: 200px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .upload-area:hover {
+        border-color: var(--primary);
+        background: rgba(108, 99, 255, 0.05);
+    }
+    
+    .upload-area.dragover {
+        border-color: var(--primary);
+        background: rgba(108, 99, 255, 0.1);
+        transform: scale(1.02);
+    }
+    
+    .upload-area .upload-icon {
+        font-size: 4rem;
+        color: rgba(255,255,255,0.15);
+        margin-bottom: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .upload-area.dragover .upload-icon {
+        color: var(--primary);
+        transform: scale(1.1);
+    }
+    
+    .upload-area .upload-text {
+        color: rgba(255,255,255,0.5);
+        font-size: 1rem;
+    }
+    
+    .upload-area .upload-subtext {
+        color: rgba(255,255,255,0.2);
+        font-size: 0.85rem;
+    }
+    
+    /* Selected file display */
+    .selected-file {
+        display: none;
+        background: rgba(0, 210, 160, 0.1);
+        border: 1px solid rgba(0, 210, 160, 0.2);
+        border-radius: 12px;
+        padding: 1rem 1.5rem;
+        margin-top: 1rem;
+        animation: slideDown 0.3s ease;
+        text-align: left;
+    }
+    
+    .selected-file.show {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .selected-file .file-name {
+        color: #00D2A0;
+        font-weight: 600;
+        font-size: 1rem;
+        word-break: break-all;
+    }
+    
+    .selected-file .file-name i {
+        margin-right: 0.5rem;
+    }
+    
+    .selected-file .remove-file {
+        color: rgba(255,255,255,0.3);
+        cursor: pointer;
+        padding: 0.3rem 0.6rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+    }
+    
+    .selected-file .remove-file:hover {
+        color: #FF6B6B;
+        background: rgba(255, 107, 107, 0.1);
+    }
+    
+    /* Uploaded files */
+    .uploaded-file {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+        border-radius: 10px;
+        padding: 0.8rem 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        transition: all 0.3s ease;
+    }
+    
+    .uploaded-file:hover {
+        background: rgba(255,255,255,0.06);
+    }
+    
+    .uploaded-file .file-info {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+    }
+    
+    .uploaded-file .file-name {
+        color: #fff;
+        font-size: 0.9rem;
+    }
+    
+    .uploaded-file .file-meta {
+        color: rgba(255,255,255,0.3);
+        font-size: 0.75rem;
+    }
+    
+    .uploaded-file .file-actions {
+        display: flex;
+        gap: 0.3rem;
+    }
+    
+    .uploaded-file .file-actions .btn {
+        padding: 0.2rem 0.6rem;
+        font-size: 0.75rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row fade-in-up">
+    <div class="col-lg-8 mx-auto">
+        <!-- Warning -->
+        <div class="alert alert-danger border-0">
+            <div class="d-flex align-items-start">
+                <div class="me-3" style="font-size: 1.5rem;">⚠️</div>
+                <div>
+                    <h5 class="mb-1"><strong>Unrestricted File Upload</strong></h5>
+                    <p class="mb-0">This tool accepts ANY file type without validation.</p>
+                    <div class="mt-2">
+                        <span class="badge bg-danger">Critical</span>
+                        <span class="badge bg-warning text-dark">No Validation</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Upload Card -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">
+                    <i class="fas fa-upload text-primary"></i> File Upload
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data" id="uploadForm">
+                    <!-- Drag & Drop Area -->
+                    <div class="upload-area" id="dropArea">
+                        <div class="upload-icon" id="uploadIcon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="upload-text" id="uploadText">
+                            <strong>Drag & drop</strong> your file here
+                        </div>
+                        <div class="upload-subtext" id="uploadSubtext">
+                            or click to browse
+                        </div>
+                        <input type="file" 
+                               class="form-control" 
+                               id="fileInput" 
+                               name="file"
+                               style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; top: 0; left: 0;">
+                    </div>
+
+                    <!-- Selected File Display -->
+                    <div class="selected-file" id="selectedFile">
+                        <span class="file-name">
+                            <i class="fas fa-file"></i> <span id="fileName">file.txt</span>
+                        </span>
+                        <button type="button" class="remove-file" id="removeFileBtn" title="Remove file">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+
+                    <!-- Upload Button -->
+                    <button type="submit" class="btn btn-primary w-100 mt-3" id="uploadBtn" disabled>
+                        <i class="fas fa-upload"></i> Upload File
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Uploaded Files List -->
+        {% if uploaded_files %}
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-folder-open text-warning"></i> Uploaded Files
+                        <span class="badge bg-secondary ms-2">{{ uploaded_files|length }}</span>
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    {% for file in uploaded_files %}
+                        <div class="uploaded-file">
+                            <div class="file-info">
+                                <i class="fas {{ file.icon }}" style="color: rgba(255,255,255,0.3);"></i>
+                                <div>
+                                    <div class="file-name">{{ file.name }}</div>
+                                    <div class="file-meta">{{ file.size_human }} • {{ file.uploaded }}</div>
+                                </div>
+                            </div>
+                            <div class="file-actions">
+                                <a href="{{ url_for('download_file', filename=file.name) }}" 
+                                   class="btn btn-sm btn-primary" 
+                                   title="Download">
+                                    <i class="fas fa-download"></i>
+                                </a>
+                                <form method="POST" action="{{ url_for('delete_file', filename=file.name) }}" 
+                                      style="display: inline;" 
+                                      onsubmit="return confirm('Delete {{ file.name }}?');">
+                                    <button type="submit" class="btn btn-sm btn-danger" title="Delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="card mt-4">
+                <div class="card-body text-center py-4">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">📂</div>
+                    <h6 class="text-white">No files uploaded yet</h6>
+                    <p class="text-secondary" style="font-size: 0.85rem;">
+                        Upload your first file using the form above!
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Vulnerability Info -->
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0">
+                    <i class="fas fa-exclamation-triangle"></i> Why This is Vulnerable
+                </h5>
+            </div>
+            <div class="card-body">
+                <pre class="bg-dark p-3 rounded" style="font-size: 0.8rem;"><code># Vulnerable Code:
+file.save(os.path.join('uploads', filename))
+# 🚨 No file type validation!
+# 🚨 No file size limit!</code></pre>
+                <p class="text-secondary">The application saves uploaded files directly without any validation.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const dropArea = document.getElementById('dropArea');
+    const fileInput = document.getElementById('fileInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const selectedFile = document.getElementById('selectedFile');
+    const fileName = document.getElementById('fileName');
+    const removeFileBtn = document.getElementById('removeFileBtn');
+    const uploadForm = document.getElementById('uploadForm');
+    const uploadText = document.getElementById('uploadText');
+    const uploadSubtext = document.getElementById('uploadSubtext');
+    const uploadIcon = document.getElementById('uploadIcon');
+
+    let currentFile = null;
+
+    // Show selected file
+    function showFile(file) {
+        currentFile = file;
+        fileName.textContent = file.name;
+        selectedFile.classList.add('show');
+        uploadBtn.disabled = false;
+        
+        // Update drop area text
+        uploadText.innerHTML = `<strong>${file.name}</strong> selected`;
+        uploadSubtext.textContent = `${(file.size / 1024).toFixed(1)} KB`;
+        uploadIcon.innerHTML = '<i class="fas fa-check-circle" style="color: #00D2A0;"></i>';
+    }
+
+    // Remove selected file
+    function removeFile() {
+        currentFile = null;
+        fileInput.value = '';
+        selectedFile.classList.remove('show');
+        uploadBtn.disabled = true;
+        
+        // Reset drop area
+        uploadText.innerHTML = '<strong>Drag & drop</strong> your file here';
+        uploadSubtext.textContent = 'or click to browse';
+        uploadIcon.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+    }
+
+    // ============================================
+    // DRAG & DROP EVENTS
+    // ============================================
+    
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+            dropArea.classList.add('dragover');
+        });
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, () => {
+            dropArea.classList.remove('dragover');
+        });
+    });
+    
+    // Handle drop
+    dropArea.addEventListener('drop', function(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            
+            // Show the file
+            showFile(file);
+            
+            // Set the file input
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(file);
+            fileInput.files = dataTransfer.files;
+        }
+    });
+
+    // ============================================
+    // FILE INPUT CHANGE
+    // ============================================
+    fileInput.addEventListener('change', function() {
+        if (this.files.length > 0) {
+            showFile(this.files[0]);
+        } else {
+            removeFile();
+        }
+    });
+
+    // ============================================
+    // REMOVE FILE BUTTON
+    // ============================================
+    removeFileBtn.addEventListener('click', removeFile);
+
+    // ============================================
+    // CLICK ON DROP AREA TRIGGERS FILE INPUT
+    // ============================================
+    dropArea.addEventListener('click', function(e) {
+        if (e.target.tagName !== 'INPUT') {
+            fileInput.click();
+        }
+    });
+
+    // ============================================
+    // FORM SUBMISSION
+    // ============================================
+    uploadForm.addEventListener('submit', function(e) {
+        if (!currentFile) {
+            e.preventDefault();
+            alert('Please select a file first!');
+        }
+    });
+
+    console.log('📁 Drag & drop your files here!');
+});
+</script>
+{% endblock %}

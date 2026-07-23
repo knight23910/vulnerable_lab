@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Post - Vulnerable Lab</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">🔐 Vulnerable Lab</a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="alert alert-danger">
+            <strong>🚨 IDOR Vulnerability:</strong> Try changing the post ID in the URL!
+            Example: <code>/post/1</code> → <code>/post/2</code> → <code>/post/3</code>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>{{ post.title }}</h3>
+            </div>
+            <div class="card-body">
+                <p class="card-text">{{ post.content }}</p>
+                <hr>
+                <p class="text-muted">
+                    <small>Post ID: {{ post.id }} | Author ID: {{ post.user_id }}</small>
+                </p>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header bg-danger text-white">
+                <strong>🔴 IDOR Vulnerability Demo</strong>
+            </div>
+            <div class="card-body">
+                <p><strong>Try this attack:</strong></p>
+                <ol>
+                    <li>Current post: <code>post/{{ post.id }}</code></li>
+                    <li>Change the ID in the URL to access other posts</li>
+                    <li>Try: <a href="{{ url_for('view_post', post_id=1) }}">Post 1</a> | 
+                             <a href="{{ url_for('view_post', post_id=2) }}">Post 2</a></li>
+                    <li>Notice you can view posts you don't own!</li>
+                </ol>
+                <div class="alert alert-danger">
+                    <strong>Vulnerability:</strong> No authorization check - any user can view any post!
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
