@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: vulnerable-lab
+    runtime: python
+    repo: https://github.com/yourusername/vulnerable_lab
+    plan: free
+    envVars:
+      - key: PORT
+        value: 10000
+      - key: SECRET_KEY
+        generateValue: true  # Render auto-generates this
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python app.py
+    healthCheckPath: /
+    autoDeploy: true
+    env:
+      - key: DATABASE_URL
+        value: sqlite:///instance/vulnerable_lab.db
