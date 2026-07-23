@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 # APP INITIALIZATION
 # ============================================
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'vulnerable_secret_key_12345_change_this_in_production'
+app.config['SECRET_KEY'] = '916c6466a4998c4350be685b735c212d82348e825a53e3b40c4aaa755af9681d'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///vulnerable_lab.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['UPLOAD_FOLDER'] = 'uploads'
