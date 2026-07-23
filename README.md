@@ -102,8 +102,8 @@ Upload test.php, malicious.html, test.exe
 # No password complexity requirements
 # No email validation
 ```
-🛠️ Technology Stack
-Backend
+#### 🛠️ Technology Stack
+### Backend
 Python 3.8+ - Core programming language
 
 Flask 2.3.2 - Web framework
