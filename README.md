@@ -262,5 +262,31 @@ Email: invalid (no validation!)
 ├── uploads/            # Uploaded files directory
 └── instance/           # SQLite database
 ```
--- Test Payload
-admin' OR '1'='1
+
+### 📝 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+⚠️ Note: This software contains intentional vulnerabilities and is for educational purposes only.
+
+### ⚠️ Security Notice
+NEVER DEPLOY THIS APPLICATION ON A PUBLIC SERVER!
+
+This application is intentionally vulnerable and should only be used:
+
+✅ In a controlled, isolated environment
+
+✅ For educational purposes
+
+✅ For penetration testing practice
+
+✅ For security research
+
+DO NOT USE:
+
+❌ On production systems
+
+❌ On public servers
+
+❌ For illegal activities
+
+❌ With real user data
