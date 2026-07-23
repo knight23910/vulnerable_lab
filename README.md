@@ -154,7 +154,6 @@ pip install -r requirements.txt
 ```
 # The database will be created automatically when you run the app
 # Or manually:
-```
 python -c "from src.app import app, db; app.app_context().push(); db.create_all()"
 ```
 5. Run the Application
