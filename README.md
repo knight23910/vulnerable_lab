@@ -247,45 +247,28 @@ bash
 python src/generate_report.py
 📁 Project Structure
 ```
-vulnerable-lab/
-├── 📄 README.md                 # This file
-├── 📄 requirements.txt          # Python dependencies
-├── 📄 .gitignore               # Git ignore rules
-├── 📄 LICENSE                  # MIT License
-│
-├── 📁 src/                     # Source code
-│   ├── 📄 app.py              # Main application
-│   ├── 📄 database.py         # Database models
-│   ├── 📄 config.py           # Configuration
-│   └── 📄 generate_report.py  # Report generator
-│
-├── 📁 templates/               # HTML templates
-│   ├── 📄 base.html           # Base template
-│   ├── 📄 index.html          # Home page
-│   ├── 📄 login.html          # SQL Injection
-│   ├── 📄 register.html       # Weak Auth
-│   ├── 📄 dashboard.html      # Dashboard
-│   ├── 📄 search.html         # XSS
-│   ├── 📄 ping.html           # Command Injection
-│   ├── 📄 profile.html        # IDOR
-│   ├── 📄 upload.html         # File Upload
-│   ├── 📄 admin.html          # Admin panel
-│   └── 📄 post.html           # IDOR
-│
-├── 📁 static/                  # Static files
-│   ├── 📁 css/
-│   │   └── 📄 style.css       # Custom styles
-│   └── 📁 js/
-│       └── 📄 script.js       # JavaScript
-│
-├── 📁 uploads/                 # Uploaded files
-│   └── 📄 .gitkeep
-│
-├── 📁 instance/                # Database
-│   └── 📄 .gitkeep
-└── 📁 tests/                   # Tests
-    ├── 📄 test_vulnerabilities.py
-    └── 📄 test_api.py
+├── app.py              # Main application with all vulnerabilities
+├── database.py       # Database models
+├── README.md
+├──📄 .gitignore               # Git ignore rules
+├── 📄 LICENSE 
+├── requirements.txt    # Python dependencies
+├── templates/          # HTML templates
+│   ├── index.html      # Home page
+│   ├── login.html      # SQL Injection vulnerability
+│   ├── register.html   # Weak Authentication
+│   ├── dashboard.html  # Main dashboard
+│   ├── profile.html    # IDOR vulnerability
+│   ├── search.html     # XSS vulnerability
+│   ├── ping.html       # Command Injection
+│   ├── upload.html     # File Upload
+│   ├── admin.html      # Admin panel
+│   └── post.html       # IDOR vulnerability
+├── static/             # CSS/JS files
+│   ├── css/style.css
+│   └── js/script.js
+├── uploads/            # Uploaded files directory
+└── instance/           # SQLite database
 ```
 -- Test Payload
 admin' OR '1'='1
