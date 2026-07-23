@@ -61,5 +61,225 @@ Vulnerable Lab is a **deliberately insecure web application** designed for cyber
 -- Vulnerable Code
 query = f"SELECT * FROM user WHERE username = '{username}' AND password = '{password}'"
 
+#### Cross-Site Scripting (XSS)
+html
+<!-- Vulnerable Code -->
+{{ query|safe }}
+
+<!-- Test Payload -->
+<script>alert('XSS')</script>
+3. Command Injection
+python
+# Vulnerable Code
+subprocess.check_output(full_cmd, shell=True)
+
+# Test Payload
+whoami
+ipconfig
+echo Hacked! & whoami
+4. IDOR (Insecure Direct Object Reference)
+python
+# Vulnerable Code - No Authorization Check
+user = User.query.filter_by(username=username).first()
+
+# Test
+/profile/admin
+/post/1
+5. Unrestricted File Upload
+python
+# Vulnerable Code - No Validation
+file.save(file_path)
+
+# Test
+Upload test.php, malicious.html, test.exe
+6. Weak Authentication
+python
+# Vulnerable Code - No Validation
+# No password complexity requirements
+# No email validation
+🛠️ Technology Stack
+Backend
+Python 3.8+ - Core programming language
+
+Flask 2.3.2 - Web framework
+
+Flask-SQLAlchemy - ORM for database
+
+Flask-Login - Session management
+
+SQLite - Database
+
+Frontend
+Bootstrap 5.1.3 - UI framework
+
+HTML5 - Structure
+
+CSS3 - Styling
+
+JavaScript - Interactivity
+
+Font Awesome - Icons
+
+Security (Intentionally Weak)
+SHA256 Hashing - Weak password storage
+
+No CSRF Protection - Vulnerability
+
+No Security Headers - Vulnerability
+
+📦 Installation
+Prerequisites
+bash
+# Check Python version
+python --version  # Should be 3.8+
+
+# Check pip
+pip --version
+Step-by-Step Setup
+1. Clone the Repository
+bash
+git clone https://github.com/yourusername/vulnerable-lab.git
+cd vulnerable-lab
+2. Create Virtual Environment
+bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
+
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+3. Install Dependencies
+bash
+pip install -r requirements.txt
+4. Set Up Database
+bash
+# The database will be created automatically when you run the app
+# Or manually:
+python -c "from src.app import app, db; app.app_context().push(); db.create_all()"
+5. Run the Application
+bash
+python src/app.py
+6. Access the Application
+text
+http://localhost:5000
+🔑 Default Credentials
+Username	Password	Role
+admin	admin123	👑 Administrator
+rahul	rahul123	👤 Regular User
+alice	alice123	👤 Regular User
+bob	bob123	👤 Regular User
+charlie	charlie123	👤 Regular User
+🎯 Usage Guide
+Step 1: Explore Vulnerabilities
+🔓 SQL Injection
+Go to Login Page
+
+Enter: admin' OR '1'='1 as username
+
+Enter anything as password
+
+You'll be logged in as admin!
+
+💀 XSS (Cross-Site Scripting)
+Go to Search Page
+
+Search for: <script>alert('XSS')</script>
+
+Observe the alert popup!
+
+⚡ Command Injection
+Go to Ping Tool
+
+Enter: whoami (Windows) or id (Linux)
+
+See system command output!
+
+🔍 IDOR
+Go to Profile Page
+
+Try: /profile/admin
+
+View admin's profile data!
+
+📁 File Upload
+Go to Upload Page
+
+Upload any file (try .php or .html)
+
+File is accepted without validation!
+
+🔑 Weak Authentication
+Go to Registration Page
+
+Register with password 123
+
+Email: invalid (no validation!)
+
+Step 2: Practice Security Testing
+bash
+# Test SQL Injection
+curl -X POST http://localhost:5000/login \
+  -d "username=admin' OR '1'='1&password=anything"
+
+# Test XSS
+curl "http://localhost:5000/search?q=<script>alert('XSS')</script>"
+
+# Test Command Injection
+curl -X POST http://localhost:5000/ping -d "ip=whoami"
+Step 3: Generate Report
+bash
+# Generate project report
+python src/generate_report.py
+📁 Project Structure
+text
+vulnerable-lab/
+├── 📄 README.md                 # This file
+├── 📄 requirements.txt          # Python dependencies
+├── 📄 .gitignore               # Git ignore rules
+├── 📄 LICENSE                  # MIT License
+│
+├── 📁 src/                     # Source code
+│   ├── 📄 app.py              # Main application
+│   ├── 📄 database.py         # Database models
+│   ├── 📄 config.py           # Configuration
+│   └── 📄 generate_report.py  # Report generator
+│
+├── 📁 templates/               # HTML templates
+│   ├── 📄 base.html           # Base template
+│   ├── 📄 index.html          # Home page
+│   ├── 📄 login.html          # SQL Injection
+│   ├── 📄 register.html       # Weak Auth
+│   ├── 📄 dashboard.html      # Dashboard
+│   ├── 📄 search.html         # XSS
+│   ├── 📄 ping.html           # Command Injection
+│   ├── 📄 profile.html        # IDOR
+│   ├── 📄 upload.html         # File Upload
+│   ├── 📄 admin.html          # Admin panel
+│   └── 📄 post.html           # IDOR
+│
+├── 📁 static/                  # Static files
+│   ├── 📁 css/
+│   │   └── 📄 style.css       # Custom styles
+│   └── 📁 js/
+│       └── 📄 script.js       # JavaScript
+│
+├── 📁 uploads/                 # Uploaded files
+│   └── 📄 .gitkeep
+│
+├── 📁 instance/                # Database
+│   └── 📄 .gitkeep
+│
+├── 📁 docs/                    # Documentation
+│   ├── 📄 Project_Report.pdf
+│   ├── 📄 Presentation.pptx
+│   └── 📁 Screenshots/
+│       ├── 📄 figure1.png
+│       ├── 📄 figure2.png
+│       └── ...
+│
+└── 📁 tests/                   # Tests
+    ├── 📄 test_vulnerabilities.py
+    └── 📄 test_api.py
 -- Test Payload
 admin' OR '1'='1
