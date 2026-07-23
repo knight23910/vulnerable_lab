@@ -73,31 +73,35 @@ query = f"SELECT * FROM user WHERE username = '{username}' AND password = '{pass
 ```
 # Vulnerable Code
 subprocess.check_output(full_cmd, shell=True)
-```
+
 # Test Payload
 whoami
 ipconfig
 echo Hacked! & whoami
-4. IDOR (Insecure Direct Object Reference)
-python
+```
+#### IDOR (Insecure Direct Object Reference)
+```
 # Vulnerable Code - No Authorization Check
 user = User.query.filter_by(username=username).first()
 
 # Test
 /profile/admin
 /post/1
-5. Unrestricted File Upload
-python
+```
+#### Unrestricted File Upload
+```
 # Vulnerable Code - No Validation
 file.save(file_path)
 
 # Test
 Upload test.php, malicious.html, test.exe
-6. Weak Authentication
-python
+```
+#### Weak Authentication
+ ```
 # Vulnerable Code - No Validation
 # No password complexity requirements
 # No email validation
+```
 🛠️ Technology Stack
 Backend
 Python 3.8+ - Core programming language
