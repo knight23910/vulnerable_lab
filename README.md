@@ -60,19 +60,20 @@ Vulnerable Lab is a **deliberately insecure web application** designed for cyber
 ```sql
 -- Vulnerable Code
 query = f"SELECT * FROM user WHERE username = '{username}' AND password = '{password}'"
-
+```
 #### Cross-Site Scripting (XSS)
-html
+```
 <!-- Vulnerable Code -->
 {{ query|safe }}
 
 <!-- Test Payload -->
 <script>alert('XSS')</script>
-3. Command Injection
-python
+```
+#### Command Injection
+```
 # Vulnerable Code
 subprocess.check_output(full_cmd, shell=True)
-
+```
 # Test Payload
 whoami
 ipconfig
