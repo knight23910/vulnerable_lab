@@ -177,16 +177,18 @@ python app.py
 http://localhost:5000
 ```
 ### 🔑 Default Credentials
-
+```
 Username	Password	Role
 admin	admin123	👑 Administrator
 rahul	rahul123	👤 Regular User
 alice	alice123	👤 Regular User
 bob	bob123	👤 Regular User
 charlie	charlie123	👤 Regular User
-🎯 Usage Guide
+```
+### 🎯 Usage Guide
 Step 1: Explore Vulnerabilities
 🔓 SQL Injection
+```
 Go to Login Page
 
 Enter: admin' OR '1'='1 as username
@@ -194,42 +196,47 @@ Enter: admin' OR '1'='1 as username
 Enter anything as password
 
 You'll be logged in as admin!
-
+```
 💀 XSS (Cross-Site Scripting)
+```
 Go to Search Page
 
 Search for: <script>alert('XSS')</script>
 
 Observe the alert popup!
-
+```
 ⚡ Command Injection
+```
 Go to Ping Tool
 
 Enter: whoami (Windows) or id (Linux)
 
 See system command output!
-
+```
 🔍 IDOR
+```
 Go to Profile Page
 
 Try: /profile/admin
 
 View admin's profile data!
-
+```
 📁 File Upload
+```
 Go to Upload Page
 
 Upload any file (try .php or .html)
 
 File is accepted without validation!
-
+```
 🔑 Weak Authentication
+```
 Go to Registration Page
 
 Register with password 123
 
 Email: invalid (no validation!)
-
+```
 Step 2: Practice Security Testing
 bash
 # Test SQL Injection
