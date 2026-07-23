@@ -102,39 +102,27 @@ Upload test.php, malicious.html, test.exe
 # No password complexity requirements
 # No email validation
 ```
-#### 🛠️ Technology Stack
-### Backend
+### 🛠️ Technology Stack
+#### Backend
 Python 3.8+ - Core programming language
-
 Flask 2.3.2 - Web framework
-
 Flask-SQLAlchemy - ORM for database
-
 Flask-Login - Session management
-
 SQLite - Database
 
-Frontend
+#### Frontend
 Bootstrap 5.1.3 - UI framework
-
 HTML5 - Structure
-
 CSS3 - Styling
-
 JavaScript - Interactivity
-
 Font Awesome - Icons
-
 Security (Intentionally Weak)
 SHA256 Hashing - Weak password storage
-
 No CSRF Protection - Vulnerability
-
 No Security Headers - Vulnerability
 
-📦 Installation
-Prerequisites
-bash
+### 📦 Installation
+```
 # Check Python version
 python --version  # Should be 3.8+
 
@@ -168,7 +156,9 @@ python src/app.py
 6. Access the Application
 text
 http://localhost:5000
-🔑 Default Credentials
+```
+### 🔑 Default Credentials
+
 Username	Password	Role
 admin	admin123	👑 Administrator
 rahul	rahul123	👤 Regular User
