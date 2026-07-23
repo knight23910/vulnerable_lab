@@ -151,6 +151,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 5. Set Up Database
+```
 # The database will be created automatically when you run the app
 # Or manually:
 ```
