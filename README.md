@@ -237,22 +237,7 @@ Register with password 123
 
 Email: invalid (no validation!)
 ```
-Step 2: Practice Security Testing
-bash
-# Test SQL Injection
-curl -X POST http://localhost:5000/login \
-  -d "username=admin' OR '1'='1&password=anything"
-
-# Test XSS
-curl "http://localhost:5000/search?q=<script>alert('XSS')</script>"
-
-# Test Command Injection
-curl -X POST http://localhost:5000/ping -d "ip=whoami"
-Step 3: Generate Report
-bash
-# Generate project report
-python src/generate_report.py
-📁 Project Structure
+## 📁 Project Structure
 ```
 ├── app.py              # Main application with all vulnerabilities
 ├── database.py       # Database models
